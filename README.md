@@ -34,10 +34,10 @@ Para manter a padronização, os projetos SISMOB devem utilizar preferencialment
 | **@nestjs/core** | Framework base da aplicação. |
 | **TypeORM** | ORM oficial para interação com o banco de dados. |
 | **oracledb** | Driver nativo para conexão com Oracle Database. |
-| **class-validator** | Validação de payloads de entrada via Decorators nos DTOs. |
-| **class-transformer** | Transformação de objetos plain-JS em instâncias de classes. |
-| **@nestjs/swagger** | Geração automática de documentação da API (OpenAPI). |
-| **@nestjs/config** | Gestão de configurações e variáveis de ambiente (`.env`). |
+| **@nestjs/jwt** | Implementação de autenticação via JSON Web Token. |
+| **@nestjs/passport**| Integração com estratégias de autenticação Passport. |
+| **bcrypt** | Algoritmo de hash para armazenamento seguro de senhas. |
+| **class-validator** | Validação de payloads e prevenção contra Injection de dados. |
 
 ---
 
@@ -63,12 +63,21 @@ Para manter a padronização, os projetos SISMOB devem utilizar preferencialment
 
 ---
 
-## 🛡️ Padrões de Desenvolvimento
+## 🔐 Padrões de Segurança
 
-1.  **Nomes de Tabelas/Colunas:** Devem seguir o padrão da SEMOB (ex: `TAB_USUARIO`, `ID_USUARIO`).
-2.  **Tratamento de Erros:** Sempre lance erros utilizando as classes dentro de `src/exceptions/`. O `AllExceptionsFilter` cuidará da resposta JSON.
-3.  **Validação:** Todo endpoint `POST/PUT` deve ter um DTO com regras de validação definidas.
-4.  **Commits:** Siga o padrão de Commits Semânticos (ex: `feat:`, `fix:`, `docs:`).
+### 1. Autenticação (JWT)
+*   **Token:** Utilizar `Bearer Token` em todas as rotas protegidas.
+*   **Expiração:** O padrão configurado é de **8 horas**. Pode ser ajustado via variável `JWT_EXPIRES_IN`.
+*   **Segredo:** Nunca deixe a `JWT_SECRET` exposta no código. Utilize o arquivo `.env`.
+
+### 2. Prevenção contra Injection (SQL/NoSQL)
+*   **Parameterized Queries:** Nunca concatene strings em consultas SQL. O **TypeORM** já faz a parametrização automática ao usar o `QueryBuilder` ou métodos de repositório.
+    *   *Errado:* `query("SELECT * FROM USER WHERE NAME = '" + name + "'")`
+    *   *Certo:* `find({ where: { name: name } })`
+*   **Validação de Entrada:** Utilize os decoradores `@IsString()`, `@IsInt()`, etc., nos DTOs. Isso impede que caracteres maliciosos ou tipos inesperados cheguem à camada de banco de dados.
+
+### 3. Senhas
+*   **Hash:** Nunca armazene senhas em texto plano. Utilize a biblioteca `bcrypt` com um *salt factor* de pelo menos 10.
 
 ---
 **SUTINF - Secretaria de Transporte e Mobilidade do DF**
