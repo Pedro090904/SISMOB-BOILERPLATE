@@ -3,7 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import databaseConfig from './config/database.config';
 import jwtConfig from './config/jwt.config';
-import { ExemploModule } from './module/example.module';
+import { LinhaModule } from './module/linha.module';
 import { JwtModule } from '@nestjs/jwt';
 
 @Module({
@@ -18,7 +18,7 @@ import { JwtModule } from '@nestjs/jwt';
       useFactory: (config: ConfigService) => config.get('jwt') as any,
       global: true,
     }),
-    ExemploModule,
+    LinhaModule,
   ],
 })
 export class AppModule {}
