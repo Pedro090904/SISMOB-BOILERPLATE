@@ -71,10 +71,10 @@ Para manter a padronização, os projetos SISMOB devem utilizar preferencialment
 *   **Segredo:** Nunca deixe a `JWT_SECRET` exposta no código. Utilize o arquivo `.env`.
 
 ### 2. Prevenção contra Injection (SQL/NoSQL)
-*   **Parameterized Queries:** Nunca concatene strings em consultas SQL. O **TypeORM** já faz a parametrização automática ao usar o `QueryBuilder` ou métodos de repositório.
-    *   *Errado:* `query("SELECT * FROM USER WHERE NAME = '" + name + "'")`
-    *   *Certo:* `find({ where: { name: name } })`
-*   **Validação de Entrada:** Utilize os decoradores `@IsString()`, `@IsInt()`, etc., nos DTOs. Isso impede que caracteres maliciosos ou tipos inesperados cheguem à camada de banco de dados.
+*   **SQL Nativo Parametrizado:** O padrão do projeto é utilizar SQL Nativo para maior controle e performance. Para evitar Injection, **nunca concatene variáveis diretamente na string SQL**. Utilize placeholders (`:1`, `:2` ou `?`) e passe os valores no array de parâmetros.
+    *   *Errado:* `query("SELECT * FROM TAB_LINHA WHERE CD_LINHA = '" + codigo + "'")`
+    *   *Certo:* `query("SELECT * FROM TAB_LINHA WHERE CD_LINHA = :1", [codigo])`
+*   **Validação de Entrada:** Utilize os decoradores `@IsString()`, `@IsInt()`, etc., nos DTOs. Isso impede que caracteres maliciosos cheguem à camada de banco de dados.
 
 ### 3. Senhas
 *   **Hash:** Nunca armazene senhas em texto plano. Utilize a biblioteca `bcrypt` com um *salt factor* de pelo menos 10.

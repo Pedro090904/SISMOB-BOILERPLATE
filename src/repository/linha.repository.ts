@@ -9,18 +9,34 @@ export class LinhaRepository extends Repository<Linha> {
   }
 
   async findByFilters(codigo?: string, descricao?: string): Promise<Linha[]> {
-    const query = this.createQueryBuilder('l');
+    let sql = `
+      SELECT 
+        id_linha as "id", 
+        cd_linha as "codigo", 
+        tx_linha as "descricao", 
+        vl_tarifa as "valorTarifa", 
+        fx_tarifaria as "faixaTarifaria", 
+        dataregistro as "dataRegistro", 
+        dt_inicial_tarifa as "dataInicialTarifa", 
+        dt_final_tarifa as "dataFinalTarifa"
+      FROM dados_mobilidade.tab_linha 
+      WHERE 1=1
+    `;
+    
+    const params: any[] = [];
 
     if (codigo) {
-      // PROTEÇÃO: O uso de :codigo vincula o valor com segurança
-      query.andWhere('l.codigo = :codigo', { codigo });
+      // PROTEÇÃO: O uso de :n (ou ?) garante que o valor seja tratado como dado, não código
+      sql += ` AND cd_linha = :${params.length + 1}`;
+      params.push(codigo);
     }
 
     if (descricao) {
-      // PROTEÇÃO: Like parametrizado
-      query.andWhere('l.descricao LIKE :descricao', { descricao: `%${descricao}%` });
+      sql += ` AND tx_linha LIKE :${params.length + 1}`;
+      params.push(`%${descricao}%`);
     }
 
-    return query.getMany();
+    // Executa a query nativa de forma segura
+    return this.dataSource.query(sql, params);
   }
 }
