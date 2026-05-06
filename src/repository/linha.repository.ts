@@ -26,13 +26,13 @@ export class LinhaRepository extends Repository<Linha> {
     const params: any[] = [];
 
     if (codigo) {
-      // PROTEÇÃO: O uso de :n (ou ?) garante que o valor seja tratado como dado, não código
-      sql += ` AND cd_linha = :${params.length + 1}`;
+      // PROTEÇÃO: No PostgreSQL nativo (pg), usamos $1, $2, etc.
+      sql += ` AND cd_linha = $${params.length + 1}`;
       params.push(codigo);
     }
 
     if (descricao) {
-      sql += ` AND tx_linha LIKE :${params.length + 1}`;
+      sql += ` AND tx_linha LIKE $${params.length + 1}`;
       params.push(`%${descricao}%`);
     }
 

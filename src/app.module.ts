@@ -3,8 +3,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import databaseConfig from './config/database.config';
 import jwtConfig from './config/jwt.config';
+import { AuthController } from './controller/auth.controller';
 import { LinhaModule } from './module/linha.module';
 import { SeedService } from './service/seed.service';
+import { AuthService } from './service/auth.service';
 import { JwtModule } from '@nestjs/jwt';
 
 @Module({
@@ -21,6 +23,7 @@ import { JwtModule } from '@nestjs/jwt';
     }),
     LinhaModule,
   ],
-  providers: [SeedService],
+  controllers: [AuthController],
+  providers: [SeedService, AuthService],
 })
 export class AppModule {}

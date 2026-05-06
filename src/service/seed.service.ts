@@ -26,8 +26,8 @@ export class SeedService implements OnApplicationBootstrap {
 
       this.logger.log('Iniciando seed da tabela tab_linha...');
 
-      // Caminho do arquivo SQL
-      const sqlPath = 'd:/SISMOB/SISMOB-BOILERPLATE/src/config/tab_linha.sql';
+      // Caminho do arquivo SQL (Robusto: funciona em qualquer lugar)
+      const sqlPath = require('path').join(process.cwd(), 'src', 'config', 'tab_linha.sql');
       
       if (!require('fs').existsSync(sqlPath)) {
         this.logger.error(`Arquivo SQL não encontrado em: ${sqlPath}`);

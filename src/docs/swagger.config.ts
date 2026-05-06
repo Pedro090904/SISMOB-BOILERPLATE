@@ -9,7 +9,7 @@ export function setupSwagger(app: INestApplication, prefix: string): void {
     )
     .setVersion('1.0')
     .addTag('Linhas')
-
+    .addBearerAuth() // Habilita o botão "Authorize" para Token JWT
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
