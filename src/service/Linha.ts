@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { LinhaRepository } from '../repository/linha.repository';
+import { LinhaRepository } from '../repository/Linha';
 import { Linha } from '../entity/Linha';
 
 @Injectable()

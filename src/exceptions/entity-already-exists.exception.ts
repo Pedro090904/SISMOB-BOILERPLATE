@@ -1,5 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
-import { BusinessException } from './business.exception';
+import { BusinessException } from './Business';
 
 /**
  * Exception thrown when an attempt is made to create a resource that already exists.

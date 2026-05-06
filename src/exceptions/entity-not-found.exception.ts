@@ -1,5 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
-import { BusinessException } from './business.exception';
+import { BusinessException } from './Business';
 
 /**
  * Exception thrown when a requested resource is not found.

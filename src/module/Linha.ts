@@ -1,9 +1,9 @@
 ﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Linha } from '../entity/Linha';
-import { LinhaRepository } from '../repository/linha.repository';
-import { LinhaService } from '../service/linha.service';
-import { LinhaController } from '../controller/linha.controller';
+import { LinhaRepository } from '../repository/Linha';
+import { LinhaService } from '../service/Linha';
+import { LinhaController } from '../controller/Linha';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Linha])],

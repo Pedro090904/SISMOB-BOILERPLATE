@@ -12,7 +12,6 @@ export default registerAs(
     password: process.env.DB_PASSWORD,
     synchronize: Boolean(process.env.DB_SYNCHRONIZE),
     logging: Boolean(process.env.DB_LOGGING),
-
-    entities: [__dirname + '/../entity/*.entity{.ts,.js}'],
+    autoLoadEntities: true,
   }),
 );
