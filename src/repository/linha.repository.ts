@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
-import { Linha } from '../entity/linha.entity';
+import { Linha } from '../entity/Linha';
 
 @Injectable()
 export class LinhaRepository extends Repository<Linha> {
@@ -22,7 +22,7 @@ export class LinhaRepository extends Repository<Linha> {
       FROM dados_mobilidade.tab_linha 
       WHERE 1=1
     `;
-    
+
     const params: any[] = [];
 
     if (codigo) {

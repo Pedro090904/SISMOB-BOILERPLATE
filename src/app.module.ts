@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import databaseConfig from './config/database.config';
 import jwtConfig from './config/jwt.config';
 import { LinhaModule } from './module/linha.module';
+import { SeedService } from './service/seed.service';
 import { JwtModule } from '@nestjs/jwt';
 
 @Module({
@@ -20,5 +21,6 @@ import { JwtModule } from '@nestjs/jwt';
     }),
     LinhaModule,
   ],
+  providers: [SeedService],
 })
 export class AppModule {}

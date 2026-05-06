@@ -1,6 +1,6 @@
 ﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Linha } from '../entity/linha.entity';
+import { Linha } from '../entity/Linha';
 import { LinhaRepository } from '../repository/linha.repository';
 import { LinhaService } from '../service/linha.service';
 import { LinhaController } from '../controller/linha.controller';
@@ -10,4 +10,4 @@ import { LinhaController } from '../controller/linha.controller';
   controllers: [LinhaController],
   providers: [LinhaService, LinhaRepository],
 })
-export class LinhaModule {}
+export class LinhaModule { }
