@@ -65,6 +65,24 @@ A documentação interativa fica disponível em:
 
 ---
 
+## 🧠 Decisão Arquitetural: Entity vs SQL Nativo
+
+Para manter a alta performance em sistemas de grande escala (como o SISMOB), seguimos esta regra de ouro:
+
+### 1. Quando usar ENTITIES (ORM)
+- **Cenário:** Operações de **CRUD** (Create, Read, Update, Delete) em uma única tabela.
+- **Vantagem:** Rapidez no desenvolvimento, validação automática de tipos e integridade dos dados.
+
+### 2. Quando usar SQL NATIVO (Sem Entity)
+- **Cenário:** **Relatórios complexos**, consultas com múltiplos `JOINS` (mais de 3 tabelas) ou agregações pesadas.
+- **Vantagem:** 
+    - **Performance Extrema:** Evita o custo de processamento (hydration) do ORM.
+    - **Flexibilidade:** Permite usar recursos específicos do PostgreSQL que o ORM muitas vezes limita.
+    - **Clareza:** Para quem vem do mundo DBA/SQL, o código fica muito mais legível que um QueryBuilder gigante.
+- **Padrão:** Nestes casos, não criamos uma Entity. Retornamos os dados diretamente em um **DTO** ou **Interface**.
+
+---
+
 ## 🏗️ Estrutura de Pastas (Padrão SISMOB)
 
 - `src/config`: Configurações de Banco, JWT e Variáveis de Ambiente.
