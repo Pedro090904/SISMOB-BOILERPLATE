@@ -3,25 +3,13 @@ import { INestApplication } from '@nestjs/common';
 
 export function setupSwagger(app: INestApplication, prefix: string): void {
   const config = new DocumentBuilder()
-    .setTitle('CDP — Controle de Dados e Permissões')
+    .setTitle('SISMOB-BOILERPLATE')
     .setDescription(
-      'API de gestão de acesso: usuários, grupos, módulos, sistemas e notificações do SISMOB.',
+      'Padrão de desenvolvimento de sistemas backend no ecossistema SISMOB.',
     )
     .setVersion('1.0')
-    .addTag('Sistemas')
-    .addTag('Módulos')
-    .addTag('Serviços')
-    .addTag('Tipos de Acesso')
-    .addTag('Pessoas AD')
-    .addTag('Preposto Empresas')
-    .addTag('Usuários')
-    .addTag('Grupos')
-    .addTag('Grupos Usuários')
-    .addTag('Grupo Módulos Acesso')
-    .addTag('Sistemas Usuários')
-    .addTag('Tipos de Notificações')
-    .addTag('Notícias')
-    .addTag('Notificações')
+    .addTag('Linhas')
+
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

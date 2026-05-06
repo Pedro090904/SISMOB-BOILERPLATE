@@ -55,9 +55,16 @@ Para manter a padronização, os projetos SISMOB devem utilizar preferencialment
 
 3.  **Configuração do Ambiente:**
     *   Renomeie o arquivo `.env.example` para `.env`.
-    *   Configure as credenciais do banco Oracle.
+    *   Configure as credenciais do banco.
 
-4.  **Desenvolvimento:**
+4.  **Subir Banco de Dados Local (Docker):**
+    ```bash
+    docker compose up -d
+    ```
+    *   O banco estará disponível na porta `5432`.
+    *   Acesse o gerenciador visual (pgAdmin) em: `http://localhost:5050` (Login: `admin@sismob.com` / Senha: `admin`).
+
+5.  **Desenvolvimento:**
     *   Inicie em modo watch: `npm run start:dev`
     *   Acesse a documentação Swagger em: `http://localhost:3000/api`
 
