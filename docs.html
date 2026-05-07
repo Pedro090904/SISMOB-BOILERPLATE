@@ -430,6 +430,10 @@ docker-compose down -v
 # Fazer o Build da imagem local (Atenção ao "." no final!)
 docker build -t sismob-app .
 
+# Rodar a imagem localmente conectando ao banco do Docker Compose/Local
+# O "-e DB_HOST=host.docker.internal" corrige o erro ECONNREFUSED do Node apontando pro Host!
+docker run -p 3000:3000 -e DB_HOST=host.docker.internal sismob-app
+
 # Autenticar no Registry (ex: GitLab)
 docker login registry.gitlab.com -u &lt;usuario&gt;
 
