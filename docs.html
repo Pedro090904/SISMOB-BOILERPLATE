@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>SISMOB Boilerplate - Documentação Técnica</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  body{font-family:system-ui,sans-serif;max-width:1100px;margin:0 auto;padding:2rem;background:#0f172a;color:#e2e8f0}
+  h1{color:#38bdf8;border-bottom:2px solid #38bdf8;padding-bottom:.5rem}
+  h2{color:#7dd3fc;margin-top:2.5rem}
+  h3{color:#93c5fd}
+  table{width:100%;border-collapse:collapse;margin:1rem 0}
+  th{background:#1e3a5f;color:#7dd3fc;padding:.6rem 1rem;text-align:left}
+  td{padding:.5rem 1rem;border-bottom:1px solid #1e293b}
+  tr:nth-child(even){background:#1e293b}
+  pre,code{background:#1e293b;padding:.2rem .4rem;border-radius:4px;font-size:.9rem}
+  pre{padding:1rem;overflow-x:auto}
+  .note{border-left:4px solid #38bdf8;background:#1e293b;padding:1rem;margin:1rem 0;border-radius:0 8px 8px 0}
+  .warn{border-left:4px solid #f59e0b;background:#1e293b;padding:1rem;margin:1rem 0;border-radius:0 8px 8px 0}
+  .danger{border-left:4px solid #ef4444;background:#1e293b;padding:1rem;margin:1rem 0;border-radius:0 8px 8px 0}
+  .tip{border-left:4px solid #22c55e;background:#1e293b;padding:1rem;margin:1rem 0;border-radius:0 8px 8px 0}
+  .mermaid{background:#1e293b;border-radius:8px;padding:1.5rem;margin:1rem 0;text-align:center}
+  hr{border-color:#1e3a5f;margin:2rem 0}
+  .badge{display:inline-block;background:#1e3a5f;color:#38bdf8;border-radius:4px;padding:.2rem .6rem;font-size:.85rem;margin:.2rem}
+</style>
+</head>
+<body>
+<h1>📘 Documentação Técnica — SISMOB Boilerplate</h1>
+<p><strong>Público-alvo:</strong> Estagiários e desenvolvedores júnior<br>
+<span class="badge">NestJS</span><span class="badge">TypeScript</span><span class="badge">PostgreSQL</span><span class="badge">TypeORM</span><span class="badge">JWT</span><span class="badge">Docker</span><span class="badge">Kubernetes</span><span class="badge">GitLab CI/CD</span></p>
+
+<hr>
+<h2>1. Visão Geral</h2>
+<table><tr><th>Categoria</th><th>Tecnologia</th></tr>
+<tr><td>Framework</td><td>NestJS 11 (Node.js + TypeScript)</td></tr>
+<tr><td>Banco de dados</td><td>PostgreSQL 15 via TypeORM</td></tr>
+<tr><td>Autenticação</td><td>JWT — expiração de 8h</td></tr>
+<tr><td>Documentação</td><td>Swagger (OpenAPI 3)</td></tr>
+<tr><td>Containers</td><td>Docker + Docker Compose</td></tr>
+<tr><td>Orquestração</td><td>Kubernetes (K8s)</td></tr>
+<tr><td>CI/CD</td><td>GitLab CI/CD</td></tr>
+</table>
+
+<h3>Fluxo do Ecossistema e CI/CD</h3>
+<div class="mermaid">
+flowchart TD
+    subgraph Desenvolvimento["💻 Ambiente de Desenvolvimento"]
+        NODE["🔷 Node / NestJS"] <-->|"Conexão TypeORM"| POSTGRES[("🐘 PostgreSQL")]
+        DCOMP["🐳 Docker-Compose"] -.->|"Sobe aplicação"| NODE
+        DCOMP -.->|"Sobe banco"| POSTGRES
+    end
+
+    subgraph CICD["🔄 Fluxo de Deploy e Containers"]
+        GITLAB["🦊 GitLab"] -->|"Pipeline CI/CD"| BUILD["🔨 Build"]
+        BUILD -->|"Gera Imagem"| PUSH["📤 Push"]
+        PUSH -->|"Armazena no Registry"| DOCKER["🐳 Docker Engine"]
+        DOCKER -->|"Deploy Produção"| PULL["📥 Pull"]
+    end
+
+    Desenvolvimento -->|"Git Push (Código)"| GITLAB
+</div>
+
+<h2>2. Estrutura de Diretórios</h2>
+<pre>
+SISMOB-BOILERPLATE/
+├── src/
+│   ├── main.ts                   ← Ponto de entrada da aplicação
+│   ├── app.module.ts             ← Módulo raiz (configura tudo)
+│   ├── config/
+│   │   ├── Database.ts           ← Config PostgreSQL
+│   │   ├── Jwt.ts                ← Config JWT
+│   │   └── tab_linha.sql         ← Seed de dados
+│   ├── module/Linha.ts           ← Módulo de Linhas
+│   ├── controller/
+│   │   ├── Auth.ts               ← POST /auth/login
+│   │   └── Linha.ts              ← GET /linhas
+│   ├── service/
+│   │   ├── Auth.ts               ← Lógica de autenticação
+│   │   ├── Linha.ts              ← Lógica de negócio
+│   │   └── Seed.ts               ← Popula banco no boot
+│   ├── repository/Linha.ts       ← Queries SQL seguras
+│   ├── entity/Linha.ts           ← Mapeamento tab_linha
+│   ├── dto/
+│   │   ├── Auth.ts               ← Validação login
+│   │   └── Linha.ts              ← Validação filtros
+│   ├── guards/Jwt.ts             ← Proteção de rotas JWT
+│   ├── filters/all-exceptions.filter.ts ← Captura erros globais
+│   ├── exceptions/
+│   │   ├── Business.ts           ← Exceção base (400)
+│   │   ├── entity-not-found.exception.ts ← 404
+│   │   └── entity-already-exists.exception.ts ← 409
+│   ├── utils/Base.ts             ← createdAt / updatedAt
+│   └── k8s/
+│       ├── app-deployment.yaml   ← Deployment K8s (2 réplicas)
+│       └── app-service.yaml      ← Service K8s
+├── .env                          ← Variáveis de ambiente
+├── docker-compose.yml            ← PostgreSQL + pgAdmin local
+├── Dockerfile                    ← Imagem produção (Node 20 Alpine)
+└── .gitlab-ci.yml                ← Pipeline CI/CD
+</pre>
+
+<h2>3. Arquitetura em Camadas</h2>
+<div class="mermaid">
+graph TB
+    subgraph Cliente["🌐 Cliente HTTP"]
+        REQ[Requisição HTTP]
+    end
+    subgraph NestJS["🔷 Aplicação NestJS"]
+        PIPE["ValidationPipe\n(class-validator)"]
+        GUARD["JwtAuthGuard\n(Verifica Bearer Token)"]
+        CTRL["Controller\n(Recebe e repassa)"]
+        SVC["Service\n(Regra de negócio)"]
+        REPO["Repository\n(Query SQL segura)"]
+        FILTER["AllExceptionsFilter\n(Formata erros)"]
+    end
+    subgraph Infra["🗄️ Infraestrutura"]
+        DB[("PostgreSQL\ndados_mobilidade")]
+        SEED["SeedService\n(Popula no boot)"]
+    end
+    REQ --> PIPE --> GUARD --> CTRL --> SVC --> REPO --> DB
+    DB --> REPO --> SVC --> CTRL --> Cliente
+    SEED -.->|"tab_linha.sql"| DB
+    GUARD -->|"Token inválido ❌"| FILTER
+    FILTER --> Cliente
+</div>
+<div class="note">💡 <strong>Cada camada só conversa com a imediatamente abaixo.</strong> Controller nunca acessa o banco diretamente. Isso facilita testes e manutenção.</div>
+
+<h2>4. Fluxo de Login — POST /api/auth/login</h2>
+<div class="mermaid">
+sequenceDiagram
+    actor U as 👤 Usuário
+    participant C as AuthController
+    participant P as ValidationPipe
+    participant S as AuthService
+    participant J as JwtService
+    U->>C: POST /api/auth/login {"username","password"}
+    C->>P: Valida LoginDto
+    P-->>C: DTO válido ✅
+    C->>S: login(loginDto)
+    S->>S: Verifica credenciais
+    alt Credenciais corretas
+        S->>J: sign({username, sub, role})
+        J-->>S: access_token (8h)
+        S-->>C: {access_token, token_type, expires_in}
+        C-->>U: HTTP 200 OK
+    else Credenciais inválidas
+        S-->>C: throw UnauthorizedException
+        C-->>U: HTTP 401 Unauthorized
+    end
+</div>
+<div class="note">💡 <strong>No boilerplate</strong>, a validação é simulada em memória (<code>admin / sismob@2026</code>). Em produção, aqui você consultaria o banco ou um servidor AD.</div>
+
+<h2>5. Fluxo de Consulta — GET /api/linhas</h2>
+<div class="mermaid">
+sequenceDiagram
+    actor U as 👤 Usuário
+    participant C as LinhaController
+    participant G as JwtAuthGuard
+    participant S as LinhaService
+    participant R as LinhaRepository
+    participant D as PostgreSQL
+    U->>C: GET /api/linhas?codigo=0.108 Bearer eyJ...
+    C->>G: canActivate()
+    G->>G: verifyAsync(token)
+    alt Token válido
+        G-->>C: true ✅
+        C->>S: buscarLinhas("0.108")
+        S->>R: findByFilters("0.108")
+        R->>D: SELECT ... WHERE cd_linha = $1 params:["0.108"]
+        D-->>R: rows[]
+        R-->>S: Linha[]
+        S-->>C: Linha[]
+        C-->>U: HTTP 200 OK [{...}]
+    else Token inválido
+        G-->>U: HTTP 401 Unauthorized
+    end
+</div>
+
+<h2>6. Proteção contra SQL Injection</h2>
+<div class="mermaid">
+flowchart TD
+    A["FilterLinhaDto\n{codigo?, descricao?}"] --> B["LinhaRepository\nfindByFilters"]
+    B --> C["SELECT ... WHERE 1=1"]
+    C --> D{codigo\nfornecido?}
+    D -- Sim --> E["sql += AND cd_linha = $1\nparams.push(codigo)"]
+    D -- Não --> F[Ignora]
+    E --> G{descricao\nfornecida?}
+    F --> G
+    G -- Sim --> H["sql += AND tx_linha LIKE $2\nparams.push('%desc%')"]
+    G -- Não --> I[Ignora]
+    H --> J["dataSource.query(sql, params)\n✅ Driver substitui $1,$2 com segurança"]
+    I --> J
+    J --> K[(PostgreSQL)]
+</div>
+<div class="warn">⚠️ <strong>NUNCA</strong> faça <code>sql += "AND cd_linha = '" + codigo + "'"</code>. Isso permite SQL Injection! Use sempre parâmetros <code>$1, $2...</code></div>
+
+<h2>7. Ciclo de Vida da Aplicação (Bootstrap)</h2>
+<div class="mermaid">
+flowchart TD
+    A["▶️ npm run start:dev"] --> B["NestFactory.create(AppModule)"]
+    B --> C["ConfigModule carrega .env"]
+    C --> D["TypeOrmModule conecta ao PostgreSQL"]
+    D --> E["JwtModule registra secret + expiresIn"]
+    E --> F["LinhaModule registra Controller, Service, Repository"]
+    F --> G["SeedService.onApplicationBootstrap()"]
+    G --> H{tab_linha\nvazia?}
+    H -- Sim --> I["Executa tab_linha.sql"]
+    H -- Não --> J["Pula seed"]
+    I --> K["ValidationPipe global"]
+    J --> K
+    K --> L["AllExceptionsFilter global"]
+    L --> M["CORS habilitado"]
+    M --> N["Swagger em /api/docs"]
+    N --> O["🚀 http://localhost:8097/api"]
+</div>
+
+<h2>8. Hierarquia de Exceções</h2>
+<div class="mermaid">
+classDiagram
+    class HttpException {
+        +getStatus() HttpStatus
+        +getResponse() object
+    }
+    class BusinessException {
+        +constructor(message, status)
+        +statusCode HttpStatus
+        +message string
+        +error string
+        +timestamp string
+    }
+    class EntityNotFoundException {
+        +constructor(entity, id)
+        Retorna HTTP 404
+    }
+    class EntityAlreadyExistsException {
+        Retorna HTTP 409
+    }
+    class AllExceptionsFilter {
+        +catch(exception, host)
+        Formata resposta padronizada
+    }
+    HttpException <|-- BusinessException
+    BusinessException <|-- EntityNotFoundException
+    BusinessException <|-- EntityAlreadyExistsException
+    AllExceptionsFilter ..> HttpException : captura
+</div>
+<p>Toda exceção retorna este formato padronizado:</p>
+<pre>{"statusCode":404,"timestamp":"2026-05-07T00:00:00.000Z","path":"/api/linhas","method":"GET","message":"Linha com identificador 999 não encontrado."}</pre>
+
+<h2>9. Entidade — tab_linha</h2>
+<div class="mermaid">
+erDiagram
+    TAB_LINHA {
+        int id_linha PK
+        varchar cd_linha "Código ex: 0.108"
+        varchar tx_linha "Descrição ex: W3 Norte"
+        numeric vl_tarifa "Tarifa ex: 5.50"
+        varchar fx_tarifaria "Faixa tarifária nullable"
+        timestamp dataregistro "Auto gerado"
+        date dt_inicial_tarifa "nullable"
+        date dt_final_tarifa "nullable"
+    }
+</div>
+
+<h2>10. Infraestrutura Local (Docker Compose)</h2>
+<div class="mermaid">
+graph TB
+    subgraph Host["💻 Máquina Local"]
+        APP["🔷 NestJS :8097"]
+        CLI["🌐 Browser / Postman"]
+    end
+    subgraph Docker["🐳 Docker Compose"]
+        PG["🐘 sismob-postgres\npostgres:15-alpine :5432"]
+        PGADMIN["🖥️ sismob-pgadmin\n:5050"]
+        VOL[("📦 Volume sismob_pgdata")]
+    end
+    APP -->|TypeORM| PG
+    CLI -->|localhost:5050| PGADMIN
+    PGADMIN --> PG
+    PG --- VOL
+</div>
+<pre>docker-compose up -d      # Sobe banco + pgAdmin
+docker-compose down       # Para tudo
+docker-compose down -v    # Reset total (apaga dados)</pre>
+
+<h2>11. Pipeline CI/CD (GitLab)</h2>
+<div class="mermaid">
+flowchart LR
+    subgraph Trigger["⚡ Trigger"]
+        TAG["git tag v1.0.0\ngit push --tags"]
+    end
+    subgraph Build["🔨 build"]
+        B1[docker login] --> B2[docker build] --> B3[docker push]
+    end
+    subgraph Test["🧪 test"]
+        T1[docker pull] --> T2["docker run --rm\nCONTAINER_START_OK"]
+    end
+    subgraph Deploy["🚀 deploy"]
+        D1["kubectl apply -f k8s/"] --> D2["kubectl set image"] --> D3["kubectl rollout status"]
+    end
+    TAG --> Build --> Test --> Deploy
+</div>
+<div class="note">💡 O pipeline <strong>só dispara com uma tag Git</strong>. Commits sem tag não acionam o CI/CD.</div>
+
+<h2>12. Arquitetura Kubernetes (Produção)</h2>
+<div class="mermaid">
+graph TB
+    USER["👤 Usuário"] --> SVC["Service K8s\napp-service.yaml :3000"]
+    SVC --> P1["🟦 Pod 1"]
+    SVC --> P2["🟦 Pod 2"]
+    ENV["Secret sismob-app-env\n(variáveis do .env)"] -.-> P1
+    ENV -.-> P2
+    REG["Secret gitlab-registry\n(credenciais de imagem)"] -.-> P1
+    REG -.-> P2
+    IMG["📦 GitLab Registry\nsismob:v1.0.0"] -.->|image pull| P1
+    IMG -.->|image pull| P2
+</div>
+<div class="tip">✅ As variáveis sensíveis (DB_PASSWORD, JWT_SECRET) nunca ficam no código. Em K8s são armazenadas como <code>Secret</code> e injetadas via <code>envFrom</code>.</div>
+
+<h2>13. Como Criar um Novo Recurso</h2>
+<div class="mermaid">
+flowchart TD
+    A["1️⃣ Entity\nsrc/entity/Veiculo.ts"] --> B["2️⃣ DTO\nsrc/dto/Veiculo.ts"]
+    B --> C["3️⃣ Repository\nsrc/repository/Veiculo.ts"]
+    C --> D["4️⃣ Service\nsrc/service/Veiculo.ts"]
+    D --> E["5️⃣ Controller\nsrc/controller/Veiculo.ts"]
+    E --> F["6️⃣ Module\nsrc/module/Veiculo.ts"]
+    F --> G["7️⃣ Importar no AppModule\napp.module.ts"]
+    G --> H["✅ /api/veiculos disponível"]
+</div>
+
+<h2>14. Variáveis de Ambiente</h2>
+<table>
+<tr><th>Variável</th><th>Exemplo</th><th>Descrição</th></tr>
+<tr><td>DB_HOST</td><td>localhost</td><td>Host do PostgreSQL</td></tr>
+<tr><td>DB_PORT</td><td>5432</td><td>Porta do PostgreSQL</td></tr>
+<tr><td>DB_SERVICE_NAME</td><td>postgres</td><td>Nome do banco</td></tr>
+<tr><td>DB_USER</td><td>postgres</td><td>Usuário</td></tr>
+<tr><td>DB_PASSWORD</td><td>postgres</td><td>Senha</td></tr>
+<tr><td>DB_SYNCHRONIZE</td><td>true</td><td>⚠️ Nunca true em produção!</td></tr>
+<tr><td>DB_LOGGING</td><td>true</td><td>Exibe queries no console</td></tr>
+<tr><td>JWT_SECRET</td><td>SISMOB_SECRET...</td><td>Chave de assinatura JWT</td></tr>
+<tr><td>JWT_EXPIRES_IN</td><td>8h</td><td>Expiração do token</td></tr>
+<tr><td>APP_PREFIX</td><td>api</td><td>Prefixo global das rotas</td></tr>
+</table>
+<div class="danger">🔴 Nunca faça commit do <code>.env</code> com dados de produção. Use Kubernetes Secrets ou variáveis de CI/CD do GitLab.</div>
+
+<h2>15. Endpoints da API</h2>
+<table>
+<tr><th>Método</th><th>Rota</th><th>Auth</th><th>Descrição</th></tr>
+<tr><td>POST</td><td>/api/auth/login</td><td>❌ Pública</td><td>Gera token JWT</td></tr>
+<tr><td>GET</td><td>/api/linhas</td><td>✅ Bearer JWT</td><td>Lista linhas com filtros</td></tr>
+<tr><td>GET</td><td>/api/docs</td><td>❌ Pública</td><td>Swagger UI</td></tr>
+</table>
+<pre>
+# 1. Obter token
+curl -X POST http://localhost:8097/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"sismob@2026"}'
+
+# 2. Consultar linhas com token
+curl http://localhost:8097/api/linhas?codigo=0.108 \
+  -H "Authorization: Bearer &lt;TOKEN&gt;"
+</pre>
+
+<h2>16. Desafios de Desenvolvimento (Para Estagiários)</h2>
+<div class="note">
+  💡 <strong>Cloneu o repositório?</strong> Teste seus conhecimentos resolvendo os seguintes desafios propostos para consolidar o entendimento desta arquitetura:
+</div>
+<ol>
+  <li><strong>CRUD Completo de Linha:</strong> Implementar as rotas que faltam (POST, PUT, DELETE e GET por ID) para a entidade <code>linha</code>. <strong>Obrigatório:</strong> Utilizar restritamente todas as pastas da arquitetura (Guards para segurança, DTOs para validação, Utils, Exceptions personalizadas, Filters, Controller, Service e Repository).</li>
+  <li><strong>Novas Entidades, CRUDs e Dados Espaciais:</strong> Criar as entidades <code>tab_operadora</code>, <code>tab_operadora_linha</code> e <code>tab_itinerario</code>. Desenvolver o CRUD completo para elas, sendo que <strong><code>tab_itinerario</code> deverá conter dados espaciais (geometrias/geography)</strong> para lidar com a rota cartográfica e desafiar o manuseio desse tipo de dado no NestJS/TypeORM. É <strong>obrigatório passar por todas as pastas da arquitetura</strong> para esses novos recursos (Module, Controller, Service, Repository, DTO, Entity), além de aplicar a camada de segurança (Guards) e Utils.</li>
+  <li><strong>Relacionamentos e Seed:</strong> Relacionar as entidades para ser possível buscar a operadora de uma determinada linha (via Operadora_Linha) e buscar o traçado cartográfico da linha (via relação Linha com Itinerario). O estagiário também deverá criar as <strong>SEEDS</strong> e a automação de inserção inicial no banco para essas novas tabelas, inclusive inserindo o dado espacial (semelhante ao arquivo <code>tab_linha.sql</code>).</li>
+  <li><strong>Containerização Docker:</strong> Subir o banco de dados e a aplicação utilizando Docker e o arquivo <code>docker-compose.yml</code> fornecido, garantindo que o backend funcione corretamente dentro do container e se conecte com o banco.</li>
+  <li><strong>Build e Push para o GitLab:</strong> Fazer o build do projeto <code>SISMOB-BOILERPLATE</code> gerando uma imagem Docker utilizando o <code>Dockerfile</code> fornecido, e realizar o envio (push) dessa imagem para o repositório de containers do GitLab.</li>
+</ol>
+
+<h2>17. Comandos Úteis (Cheat Sheet)</h2>
+<p>Guia rápido com todos os comandos necessários no dia a dia, desde baixar o código até buildar a imagem Docker:</p>
+
+<h3>🦊 Git & Versionamento</h3>
+<pre>
+# Clonar o repositório
+git clone &lt;url-do-repositorio&gt;
+
+# Enviar alterações
+git add .
+git commit -m "feat: adicionando CRUD de operadora"
+git push origin main
+
+# Criar e enviar Tag (dispara o Pipeline no GitLab!)
+git tag v1.0.1
+git push --tags
+</pre>
+
+<h3>🔷 Node.js & NestJS</h3>
+<pre>
+# Instalar dependências iniciais
+npm install
+
+# Rodar aplicação local com auto-reload
+npm run start:dev
+
+# Compilar para produção (gera pasta /dist)
+npm run build
+
+# Atalhos práticos do Nest CLI (cria os arquivos base)
+npx nest g module operadora
+npx nest g controller operadora
+npx nest g service operadora
+</pre>
+
+<h3>🐳 Docker Compose (Ambiente Local)</h3>
+<pre>
+# Subir banco de dados e pgAdmin
+docker-compose up -d
+
+# Visualizar logs do banco em tempo real
+docker-compose logs -f sismob-db
+
+# Parar os containers
+docker-compose down
+
+# Parar containers E APAGAR DADOS DO BANCO (reset)
+docker-compose down -v
+</pre>
+
+<h3>📦 Docker Image (Build e Push)</h3>
+<pre>
+# Fazer o Build da imagem local (Atenção ao "." no final!)
+docker build -t sismob-app .
+
+# Autenticar no Registry (ex: GitLab)
+docker login registry.gitlab.com -u &lt;usuario&gt;
+
+# Nomear (Taggear) a imagem para o repositório correto
+docker tag sismob-app registry.gitlab.com/projeto/sismob-app:latest
+
+# Enviar (Push) a imagem para o repositório
+docker push registry.gitlab.com/projeto/sismob-app:latest
+</pre>
+
+<script>mermaid.initialize({startOnLoad:true,theme:'dark'});</script>
+</body>
+</html>

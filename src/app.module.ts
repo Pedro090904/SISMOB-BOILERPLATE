@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import databaseConfig from './config/Database';
 import jwtConfig from './config/Jwt';
 import { AuthController } from './controller/Auth';
+import { DocsController } from './controller/Docs';
 import { LinhaModule } from './module/Linha';
 import { SeedService } from './service/Seed';
 import { AuthService } from './service/Auth';
@@ -30,7 +31,7 @@ import { JwtModule } from '@nestjs/jwt';
     }),
     LinhaModule,
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, DocsController],
   providers: [SeedService, AuthService],
 })
 export class AppModule { }
