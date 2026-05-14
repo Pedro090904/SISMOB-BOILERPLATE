@@ -1,9 +1,7 @@
-version: '3.8'
-
 services:
   # Banco de Dados PostgreSQL
   sismob-db:
-    image: postgres:15-alpine
+    image: postgis/postgis:15-3.3-alpine
     container_name: sismob-postgres
     restart: always
     environment:
@@ -29,5 +27,36 @@ services:
     depends_on:
       - sismob-db
 
+  # Oracle XE (Banco de Dados)
+  sismob-oracle:
+    image: gvenzl/oracle-xe:21-slim-faststart
+    container_name: sismob-oracle
+    restart: always
+    environment:
+      ORACLE_PASSWORD: ${ORACLE_PASSWORD:-admin}
+      APP_USER: ${DB_USER:-sismob}
+      APP_USER_PASSWORD: ${DB_PASSWORD:-sismob}
+    ports:
+      - "1521:1521"
+    volumes:
+      - sismob_oradata:/opt/oracle/oradata
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Interface Visual para Oracle e Postgres (Acesse em http://localhost:5051)
+  dbgate:
+    image: dbgate/dbgate
+    container_name: sismob-dbgate
+    restart: always
+    ports:
+      - "5051:3000"
+    depends_on:
+      - sismob-db
+      - sismob-oracle
+
 volumes:
   sismob_pgdata:
+  sismob_oradata:
